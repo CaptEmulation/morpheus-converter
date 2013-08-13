@@ -8,15 +8,16 @@
 class QMVideoSurfaceFormatGrabber: public QAbstractVideoSurface
 {
 public:
-    QVideoSurfaceFormat mFormat;
-    QVideoSurfaceFormat format() { return mFormat; }
 
     QMVideoSurfaceFormatGrabber() {
     }
 
     bool start(const QVideoSurfaceFormat &format) {
-        mFormat = format;
         return QAbstractVideoSurface::start(format);
+    }
+
+    void stop() {
+
     }
 
     QList<QVideoFrame::PixelFormat> supportedPixelFormats(
@@ -34,7 +35,7 @@ public:
     }
 
     bool present(const QVideoFrame &frame) {
-        // do nothing
+
         return true;
     }
 
@@ -44,22 +45,24 @@ class QMPanConverterPrivate
 {
 public:
     QMPanConverter *self;
-    QScopedPointer<QMVideoSurfaceFormatGrabber> mFormatGrabber;
+    QMVideoSurfaceFormatGrabber* mFormatGrabber;
     QVideoProbe *mVideoProbe;
     QMediaPlayer *mMediaPlayer;
     QString mFileName;
-    QImage::Format mFormat;
     qint32 mCount;
+    QProgressBar *mProgressBar;
 
     void initialize() {
-        mFormatGrabber.reset(new QMVideoSurfaceFormatGrabber());
+        mFormatGrabber = new QMVideoSurfaceFormatGrabber();
         mMediaPlayer = new QMediaPlayer(self);
         mVideoProbe = new QVideoProbe(self);
-        mMediaPlayer->setVideoOutput(mFormatGrabber.data());
+        mMediaPlayer->setVideoOutput(mFormatGrabber);
         mVideoProbe->setSource(mMediaPlayer);
 
         mCount = 0;
+        mProgressBar = Q_NULLPTR;
         QObject::connect(mVideoProbe, &QVideoProbe::videoFrameProbed, self, &QMPanConverter::videoFrameLoaded);
+        QObject::connect(mMediaPlayer, &QMediaPlayer::positionChanged, self, &QMPanConverter::positionChanged);
     }
 
     void videoFrameLoaded(const QVideoFrame &frame) {
@@ -75,9 +78,9 @@ public:
                 nonConstFrame.width(),
                 nonConstFrame.height(),
                 nonConstFrame.bytesPerLine(),
-                mFormat);
+                QVideoFrame::imageFormatFromPixelFormat(frame.pixelFormat()));
 
-        QString imgFileName = QString("%1.%2.PNG").arg(mFileName).arg(mCount++);
+        QString imgFileName = QString("%1.%2.PNG").arg(mFileName).arg(++mCount, 2, 10, QChar('0'));
         image.save(imgFileName);
 
         // Decrement ref pointer
@@ -85,17 +88,30 @@ public:
     }
 
     void processMovie(QString movieFileName) {
+        if(mProgressBar) {
+            mProgressBar->setRange(0, 100);
+            mProgressBar->setValue(0);
+        }
         mFileName = movieFileName;
         mFileName.chop(4);
         QFileInfo fileInfo(mFileName);
         if (fileInfo.exists()) {
 
         }
-        QUrl url = QUrl::fromLocalFile(mFileName);
-
+        QUrl url = QUrl::fromLocalFile(movieFileName);
+        mMediaPlayer->setNotifyInterval(1000 / 60);
         mMediaPlayer->setMedia(url);
         mMediaPlayer->play();
     }
+
+     void positionChanged(int pos) {
+        int duration = mMediaPlayer->duration();
+        if (duration && mProgressBar) {
+            mProgressBar->setRange(0, duration);
+            mProgressBar->setValue(pos);
+        }
+     }
+
 };
 
 QMPanConverter::QMPanConverter(QObject *parent) :
@@ -110,10 +126,26 @@ QMPanConverter::~QMPanConverter()
 {
 }
 
+QProgressBar *QMPanConverter::progressBar()
+{
+    return p->mProgressBar;
+}
+
+void QMPanConverter::setProgressBar(QProgressBar *progressBar)
+{
+    p->mProgressBar = progressBar;
+    emit progressBarChanged();
+}
+
 
 void QMPanConverter::videoFrameLoaded(const QVideoFrame &frame)
 {
     p->videoFrameLoaded(frame);
+}
+
+void QMPanConverter::positionChanged(int pos)
+{
+    p->positionChanged(pos);
 }
 
 void QMPanConverter::processMovie(QString movieFileName)

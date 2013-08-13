@@ -14,10 +14,9 @@ public:
     void initialize() {
         ui.reset(new Ui::MainWindow);
         ui->setupUi(self);
-        QObject::connect(ui->actionOpen, SIGNAL(triggered()), self, SLOT(openFileDialog()));
+        ui->progressBar->setValue(0);
+        QObject::connect(ui->actionConvertMovie, SIGNAL(triggered()), self, SLOT(openFileDialog()));
     }
-
-
 
 };
 
@@ -45,6 +44,7 @@ void MainWindow::openFileDialog()
                                 options);
     if (!fileName.isEmpty()) {
         QMPanConverter *converter = new QMPanConverter(this);
+        converter->setProgressBar(p->ui->progressBar);
         converter->processMovie(fileName);
     }
 }

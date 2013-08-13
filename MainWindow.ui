@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>111</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,9 +15,6 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QVideoWidget" name="movieWidget" native="true"/>
-    </item>
     <item>
      <widget class="QProgressBar" name="progressBar">
       <property name="value">
@@ -40,7 +37,7 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpen"/>
+    <addaction name="actionConvertMovie"/>
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -54,9 +51,9 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionOpen">
+  <action name="actionConvertMovie">
    <property name="text">
-    <string>Open</string>
+    <string>Convert Movie To Images</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -72,14 +69,23 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>QVideoWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">QVideoWidget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>199</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>55</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
