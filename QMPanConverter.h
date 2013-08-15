@@ -16,7 +16,7 @@ class QMPanConverter : public QObject
     Q_PROPERTY(QProgressBar *progressBar READ progressBar WRITE setProgressBar NOTIFY progressBarChanged);
 
 public:
-    explicit QMPanConverter(QObject *videoWidget);
+    explicit QMPanConverter(QObject *parent = 0);
     ~QMPanConverter();
 
     QProgressBar *progressBar();
@@ -26,7 +26,7 @@ signals:
     void progressBarChanged();
     
 public slots:
-    void processMovie(QString movieFileName);
+    void acceptFile(QString movieFileName);
 
 protected slots:
     void videoFrameLoaded(const QVideoFrame &frame);

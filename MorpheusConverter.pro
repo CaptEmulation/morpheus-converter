@@ -14,9 +14,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         MainWindow.cpp \
-        QMPanConverter.cpp
+        QMPanConverter.cpp \
+    QMDirConverter.cpp \
+    QMConverterRouter.cpp
 
 HEADERS  += MainWindow.h \
-        QMPanConverter.h
+        QMPanConverter.h \
+    QMDirConverter.h \
+    QMConverterRouter.h \
+    QMIAcceptUrl.h
 
 FORMS    += MainWindow.ui

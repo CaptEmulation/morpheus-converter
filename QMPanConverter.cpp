@@ -87,7 +87,7 @@ public:
         nonConstFrame.unmap();
     }
 
-    void processMovie(QString movieFileName) {
+    void acceptFile(QString movieFileName) {
         if(mProgressBar) {
             mProgressBar->setRange(0, 100);
             mProgressBar->setValue(0);
@@ -148,7 +148,7 @@ void QMPanConverter::positionChanged(int pos)
     p->positionChanged(pos);
 }
 
-void QMPanConverter::processMovie(QString movieFileName)
+void QMPanConverter::acceptFile(QString movieFileName)
 {
-    p->processMovie(movieFileName);
+    p->acceptFile(movieFileName);
 }

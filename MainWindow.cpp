@@ -14,7 +14,7 @@ public:
     void initialize() {
         ui.reset(new Ui::MainWindow);
         ui->setupUi(self);
-        ui->progressBar->setValue(0);
+
         QObject::connect(ui->actionConvertMovie, SIGNAL(triggered()), self, SLOT(openFileDialog()));
     }
 
@@ -32,7 +32,7 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::openFileDialog()
+void MainWindow::openSingleFileDialog()
 {
     const QFileDialog::Options options = QFlag(0);
     QString selectedFilter;
@@ -44,7 +44,23 @@ void MainWindow::openFileDialog()
                                 options);
     if (!fileName.isEmpty()) {
         QMPanConverter *converter = new QMPanConverter(this);
-        converter->setProgressBar(p->ui->progressBar);
+        converter->setProgressBar(p->ui->fileProgressBar);
+        converter->acceptFile(fileName);
+    }
+}
+
+void MainWindow::openFolderDialog()
+{
+    QString selectedFilter;
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                tr("Open PAN movie"),
+                                tr(""),
+                                tr("All Files (*);;Movie Files (*.mp4)"),
+                                &selectedFilter,
+                                QFileDialog::ShowDirsOnly);
+    if (!fileName.isEmpty()) {
+        QMPanConverter *converter = new QMPanConverter(this);
+        converter->setProgressBar(p->ui->fileProgressBar);
         converter->processMovie(fileName);
     }
 }

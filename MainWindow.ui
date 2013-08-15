@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>111</height>
+    <height>175</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +16,56 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QProgressBar" name="progressBar">
+     <spacer name="verticalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QLabel" name="totalProgressLabel">
+      <property name="text">
+       <string>Total Progress</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QProgressBar" name="totalProgressBar">
       <property name="value">
-       <number>24</number>
+       <number>0</number>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QLabel" name="fileProgressLabel">
+      <property name="text">
+       <string>File Progress</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QProgressBar" name="fileProgressBar">
+      <property name="value">
+       <number>0</number>
       </property>
      </widget>
     </item>
@@ -38,6 +85,7 @@
      <string>File</string>
     </property>
     <addaction name="actionConvertMovie"/>
+    <addaction name="actionConvertFolder"/>
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -67,6 +115,11 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
+  <action name="actionConvertFolder">
+   <property name="text">
+    <string>Convert Folder</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
@@ -78,8 +131,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>199</x>
-     <y>55</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>199</x>
