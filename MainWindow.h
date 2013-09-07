@@ -18,7 +18,8 @@ public:
     ~MainWindow();
     
 public slots:
-    void openFileDialog();
+    void openSingleFileDialog();
+    void openFolderDialog();
 
 private:
     QScopedPointer<MainWindowPrivate> p;

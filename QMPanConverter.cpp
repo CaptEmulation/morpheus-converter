@@ -1,12 +1,12 @@
 #include "QMPanConverter.h"
+
 #include <QVideoProbe>
 #include <QMediaPlayer>
 #include <QAbstractVideoSurface>
 #include <QVideoSurfaceFormat>
 #include <QFileInfo>
 
-class QMVideoSurfaceFormatGrabber: public QAbstractVideoSurface
-{
+class QMVideoSurfaceFormatGrabber: public QAbstractVideoSurface {
 public:
 
     QMVideoSurfaceFormatGrabber() {
@@ -53,10 +53,9 @@ public:
     QProgressBar *mProgressBar;
 
     void initialize() {
-        mFormatGrabber = new QMVideoSurfaceFormatGrabber();
         mMediaPlayer = new QMediaPlayer(self);
         mVideoProbe = new QVideoProbe(self);
-        mMediaPlayer->setVideoOutput(mFormatGrabber);
+        mMediaPlayer->setVideoOutput(new QMVideoSurfaceFormatGrabber());
         mVideoProbe->setSource(mMediaPlayer);
 
         mCount = 0;
@@ -78,29 +77,27 @@ public:
                 nonConstFrame.width(),
                 nonConstFrame.height(),
                 nonConstFrame.bytesPerLine(),
-                QVideoFrame::imageFormatFromPixelFormat(frame.pixelFormat()));
+                QVideoFrame::imageFormatFromPixelFormat(nonConstFrame.pixelFormat()));
 
-        QString imgFileName = QString("%1.%2.PNG").arg(mFileName).arg(++mCount, 2, 10, QChar('0'));
-        image.save(imgFileName);
+        QString imgFileName = QString("%1.%2.png").arg(mFileName).arg(++mCount, 2, 10, QChar('0'));
+        bool saved = image.save(imgFileName, "png");
 
         // Decrement ref pointer
         nonConstFrame.unmap();
     }
 
-    void acceptFile(QString movieFileName) {
+    void acceptUrl(QUrl url) {
         if(mProgressBar) {
             mProgressBar->setRange(0, 100);
             mProgressBar->setValue(0);
         }
-        mFileName = movieFileName;
+        mFileName = url.toLocalFile();
         mFileName.chop(4);
-        QFileInfo fileInfo(mFileName);
-        if (fileInfo.exists()) {
 
-        }
-        QUrl url = QUrl::fromLocalFile(movieFileName);
         mMediaPlayer->setNotifyInterval(1000 / 60);
         mMediaPlayer->setMedia(url);
+        mMediaPlayer->setMuted(true);
+        mMediaPlayer->setPlaybackRate(5.0);
         mMediaPlayer->play();
     }
 
@@ -148,7 +145,7 @@ void QMPanConverter::positionChanged(int pos)
     p->positionChanged(pos);
 }
 
-void QMPanConverter::acceptFile(QString movieFileName)
+void QMPanConverter::acceptUrl(QUrl url)
 {
-    p->acceptFile(movieFileName);
+    p->acceptUrl(url);
 }

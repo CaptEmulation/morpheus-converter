@@ -2,6 +2,7 @@
 #define QMCONVERTERROUTER_H
 
 #include <QObject>
+#include <QUrl>
 
 class QMConverterRouterPrivate;
 

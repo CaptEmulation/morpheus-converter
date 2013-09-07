@@ -6,7 +6,8 @@
 
 class QMIAcceptUrl {
 public:
-    virtual void acceptUrl(QUrl url);
+    virtual void acceptUrl(QUrl url) = 0;
+    virtual ~QMIAcceptUrl() {}
 };
 
 Q_DECLARE_INTERFACE(

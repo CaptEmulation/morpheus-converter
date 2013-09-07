@@ -28,10 +28,10 @@ void QMConverterRouter::addConverter(QObject *converter)
     p->mConverters.append(converter);
 }
 
-void QMConverterRouter::acceptFile(QString filePath)
+void QMConverterRouter::acceptFile(QUrl fileUrl)
 {
 }
 
-void QMConverterRouter::acceptDir(QString dirPath)
+void QMConverterRouter::acceptDir(QUrl fileUrl)
 {
 }

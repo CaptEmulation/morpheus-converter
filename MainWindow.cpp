@@ -15,7 +15,7 @@ public:
         ui.reset(new Ui::MainWindow);
         ui->setupUi(self);
 
-        QObject::connect(ui->actionConvertMovie, SIGNAL(triggered()), self, SLOT(openFileDialog()));
+        QObject::connect(ui->actionConvertMovie, SIGNAL(triggered()), self, SLOT(openSingleFileDialog()));
     }
 
 };
@@ -43,9 +43,13 @@ void MainWindow::openSingleFileDialog()
                                 &selectedFilter,
                                 options);
     if (!fileName.isEmpty()) {
-        QMPanConverter *converter = new QMPanConverter(this);
-        converter->setProgressBar(p->ui->fileProgressBar);
-        converter->acceptFile(fileName);
+        QFileInfo fileInfo(fileName);
+        if (fileInfo.exists()) {
+            QMPanConverter *converter = new QMPanConverter(this);
+            converter->setProgressBar(p->ui->fileProgressBar);
+            converter->acceptUrl(QUrl::fromLocalFile(fileName));
+        }
+
     }
 }
 
@@ -59,8 +63,6 @@ void MainWindow::openFolderDialog()
                                 &selectedFilter,
                                 QFileDialog::ShowDirsOnly);
     if (!fileName.isEmpty()) {
-        QMPanConverter *converter = new QMPanConverter(this);
-        converter->setProgressBar(p->ui->fileProgressBar);
-        converter->processMovie(fileName);
+
     }
 }
