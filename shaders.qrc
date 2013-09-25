@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>shader/yuvFragment.glsl</file>
+        <file>shader/rgbFragment.glsl</file>
+        <file>shader/vertexShader.glsl</file>
+    </qresource>
+</RCC>

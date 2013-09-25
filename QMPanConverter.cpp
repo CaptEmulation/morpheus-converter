@@ -1,5 +1,6 @@
 #include "QMPanConverter.h"
-
+#include "QMFrameSoftwareRenderYuv.h"
+#include "log4qt/logger.h"
 #include <QVideoProbe>
 #include <QMediaPlayer>
 #include <QAbstractVideoSurface>
@@ -41,18 +42,22 @@ public:
 
 };
 
+
 class QMPanConverterPrivate
 {
 public:
     QMPanConverter *self;
+    Log4Qt::Logger *log;
     QMVideoSurfaceFormatGrabber* mFormatGrabber;
     QVideoProbe *mVideoProbe;
     QMediaPlayer *mMediaPlayer;
     QString mFileName;
     qint32 mCount;
     QProgressBar *mProgressBar;
+    QMFrameSoftwareRenderYuv *mFrameConverter;
 
     void initialize() {
+        log = Log4Qt::Logger::logger("QMPanConverter");
         mMediaPlayer = new QMediaPlayer(self);
         mVideoProbe = new QVideoProbe(self);
         mMediaPlayer->setVideoOutput(new QMVideoSurfaceFormatGrabber());
@@ -60,30 +65,52 @@ public:
 
         mCount = 0;
         mProgressBar = Q_NULLPTR;
+        mFrameConverter = new QMFrameSoftwareRenderYuv(self);
+
         QObject::connect(mVideoProbe, &QVideoProbe::videoFrameProbed, self, &QMPanConverter::videoFrameLoaded);
         QObject::connect(mMediaPlayer, &QMediaPlayer::positionChanged, self, &QMPanConverter::positionChanged);
     }
 
-    void videoFrameLoaded(const QVideoFrame &frame) {
-        // TODO save video frame or something
 
-        // Copy const QVideoFrame to mutable QVideoFrame.
-        QVideoFrame nonConstFrame = frame;
-        // Unlock for reading the stack frame (increment ref pointer)
-        nonConstFrame.map(QAbstractVideoBuffer::ReadOnly);
-        // Create new image from the frame bits
-        QImage image(
-                nonConstFrame.bits(),
-                nonConstFrame.width(),
-                nonConstFrame.height(),
-                nonConstFrame.bytesPerLine(),
-                QVideoFrame::imageFormatFromPixelFormat(nonConstFrame.pixelFormat()));
+
+    void videoFrameLoaded(const QVideoFrame &frame) {
+        log->trace("ENTER videoFrameLoaded");
+
+
+        log->debug("Pixel format: %1", frame.pixelFormat());
+        QImage image;
+        if (frame.pixelFormat() == QVideoFrame::Format_RGB32) {
+            // Copy const QVideoFrame to mutable QVideoFrame.
+            QVideoFrame nonConstFrame = frame;
+            // Unlock for reading the stack frame (increment ref pointer)
+            nonConstFrame.map(QAbstractVideoBuffer::ReadOnly);
+            // Create new image from the frame bits
+            image = QImage(
+                    nonConstFrame.bits(),
+                    nonConstFrame.width(),
+                    nonConstFrame.height(),
+                    nonConstFrame.bytesPerLine(),
+                    QVideoFrame::imageFormatFromPixelFormat(nonConstFrame.pixelFormat()));
+            nonConstFrame.unmap();
+        } else {
+            image = QImage(frame.size(), QImage::Format_RGB32);
+            mFrameConverter->convertFrame(frame, &image);
+        }
+        log->debug("File converted");
 
         QString imgFileName = QString("%1.%2.png").arg(mFileName).arg(++mCount, 2, 10, QChar('0'));
-        bool saved = image.save(imgFileName, "png");
+        //QFile file(imgFileName);
+        //file.open(QFile::WriteOnly);
 
-        // Decrement ref pointer
-        nonConstFrame.unmap();
+        bool saved = image.save(imgFileName, "png");
+        if (saved) {
+            log->info("File: %1 saved", imgFileName);
+        } else {
+            log->info("File: %1 not saved", imgFileName);
+        }
+
+
+        log->trace("LEAVE videoFrameLoaded");
     }
 
     void acceptUrl(QUrl url) {
@@ -92,7 +119,7 @@ public:
             mProgressBar->setValue(0);
         }
         mFileName = url.toLocalFile();
-        mFileName.chop(4);
+        //mFileName.chop(4);
 
         mMediaPlayer->setNotifyInterval(1000 / 60);
         mMediaPlayer->setMedia(url);
