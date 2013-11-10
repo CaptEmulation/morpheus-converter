@@ -124,7 +124,7 @@ public:
         mMediaPlayer->setNotifyInterval(1000 / 60);
         mMediaPlayer->setMedia(url);
         mMediaPlayer->setMuted(true);
-        mMediaPlayer->setPlaybackRate(5.0);
+        mMediaPlayer->setPlaybackRate(1.0);
         mMediaPlayer->play();
     }
 
