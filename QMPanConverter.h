@@ -22,7 +22,7 @@ public:
     explicit QMPanConverter(QObject *parent = 0);
     ~QMPanConverter();
 
-    QProgressBar *progressBar();
+    QProgressBar *progressBar() const;
     void setProgressBar(QProgressBar* progressBar);
     
 signals:

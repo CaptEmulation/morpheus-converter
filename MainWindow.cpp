@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include "QMPanConverter.h"
+#include "QMDirConverter.h"
 
 #include <QFileDialog>
 
@@ -16,7 +17,10 @@ public:
         ui->setupUi(self);
 
         QObject::connect(ui->actionConvertMovie, SIGNAL(triggered()), self, SLOT(openSingleFileDialog()));
+        QObject::connect(ui->actionConvertFolder, SIGNAL(triggered()), self, SLOT(openFolderDialog()));
     }
+
+
 
 };
 
@@ -56,13 +60,17 @@ void MainWindow::openSingleFileDialog()
 void MainWindow::openFolderDialog()
 {
     QString selectedFilter;
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                tr("Open PAN movie"),
-                                tr(""),
-                                tr("All Files (*);;Movie Files (*.mp4)"),
-                                &selectedFilter,
-                                QFileDialog::ShowDirsOnly);
-    if (!fileName.isEmpty()) {
+    QString folderName = QFileDialog::getExistingDirectory(this,
+                                tr("Open Folder"));
+    if (!folderName.isEmpty()) {
+        QMDirConverter *converter = new QMDirConverter(this);
+        converter->setProgressBar(p->ui->totalProgressBar);
+        QMPanConverter *panConverter = new QMPanConverter(this);
+        panConverter->setProgressBar(p->ui->fileProgressBar);
+
+        QStringList filters;
+        filters.append("*PAN");
+        converter->acceptUrl(QUrl::fromLocalFile(folderName), filters, panConverter);
 
     }
 }

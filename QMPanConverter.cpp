@@ -150,7 +150,7 @@ QMPanConverter::~QMPanConverter()
 {
 }
 
-QProgressBar *QMPanConverter::progressBar()
+QProgressBar *QMPanConverter::progressBar() const
 {
     return p->mProgressBar;
 }
