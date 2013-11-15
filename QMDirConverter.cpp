@@ -7,6 +7,8 @@ class QMDirConverterPrivate
 public:
     QMDirConverter *self;
     QProgressBar *mProgressBar;
+    QList<QUrl> mUrlsToConvert;
+    QMPanConverter *mConverter;
 
     QProgressBar *progressBar() const {
         return mProgressBar;
@@ -29,6 +31,10 @@ public:
             }
             recurseDir(dir, filters, converter);
         }
+
+        mConverter = converter;
+        QObject::connect(converter, &QMPanConverter::done, self, &QMDirConverter::doNext, Qt::QueuedConnection);
+        doNext();
     }
 
     int getFileCount(QDir dir, QStringList filters) {
@@ -49,8 +55,7 @@ public:
             QFileInfo info(dir.filePath(entry));
             if (info.exists()) {
                 QUrl url = QUrl::fromLocalFile(info.absoluteFilePath());
-                mProgressBar->setValue(mProgressBar->value() + 1);
-                converter->acceptUrl(url);
+                mUrlsToConvert.append(url);
             }
         }
 
@@ -61,6 +66,14 @@ public:
             }
         }
 
+    }
+
+    void doNext() {
+        if(mUrlsToConvert.length()) {
+            QUrl url = mUrlsToConvert.takeFirst();
+            mProgressBar->setValue(mProgressBar->value() + 1);
+            mConverter->acceptUrl(url);
+        }
     }
 
 };
@@ -92,4 +105,9 @@ void QMDirConverter::setProgressBar(QProgressBar *progressBar)
 void QMDirConverter::acceptUrl(QUrl url, QStringList filters, QMPanConverter *converter)
 {
     p->acceptUrl(url, filters, converter);
+}
+
+void QMDirConverter::doNext()
+{
+    p->doNext();
 }

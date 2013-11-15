@@ -8,6 +8,7 @@
 #include <QVideoFrame>
 #include <QUrl>
 #include <QProgressBar>
+#include <QMediaPlayer>
 
 class QMPanConverterPrivate;
 
@@ -27,12 +28,14 @@ public:
     
 signals:
     void progressBarChanged();
+    void done();
     
 public slots:
     void acceptUrl(QUrl url);
 
 protected slots:
     void videoFrameLoaded(const QVideoFrame &frame);
+    void mediaStatusChanged(QMediaPlayer::MediaStatus status);
     void positionChanged(int pos);
 
 private:

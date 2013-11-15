@@ -69,6 +69,7 @@ public:
 
         QObject::connect(mVideoProbe, &QVideoProbe::videoFrameProbed, self, &QMPanConverter::videoFrameLoaded);
         QObject::connect(mMediaPlayer, &QMediaPlayer::positionChanged, self, &QMPanConverter::positionChanged);
+        QObject::connect(mMediaPlayer, &QMediaPlayer::mediaStatusChanged, self, &QMPanConverter::mediaStatusChanged);
     }
 
 
@@ -136,6 +137,12 @@ public:
         }
      }
 
+     void mediaStatusChanged(QMediaPlayer::MediaStatus status) {
+         if (status == QMediaPlayer::EndOfMedia || status == QMediaPlayer::InvalidMedia) {
+             emit self->done();
+         }
+     }
+
 };
 
 QMPanConverter::QMPanConverter(QObject *parent) :
@@ -165,6 +172,11 @@ void QMPanConverter::setProgressBar(QProgressBar *progressBar)
 void QMPanConverter::videoFrameLoaded(const QVideoFrame &frame)
 {
     p->videoFrameLoaded(frame);
+}
+
+void QMPanConverter::mediaStatusChanged(QMediaPlayer::MediaStatus status)
+{
+    p->mediaStatusChanged(status);
 }
 
 void QMPanConverter::positionChanged(int pos)

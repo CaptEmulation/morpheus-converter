@@ -25,6 +25,7 @@ signals:
 
 public slots:
     void acceptUrl(QUrl url, QStringList filters, QMPanConverter *converter);
+    void doNext();
 
 private:
     QScopedPointer<QMDirConverterPrivate> p;
