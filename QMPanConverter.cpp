@@ -121,7 +121,7 @@ public:
         }
         mFileName = url.toLocalFile();
         //mFileName.chop(4);
-
+        mCount = 0;
         mMediaPlayer->setNotifyInterval(1000 / 60);
         mMediaPlayer->setMedia(url);
         mMediaPlayer->setMuted(true);
